@@ -1,9 +1,9 @@
 ![branding](https://github.com/TheMrSnoop/callisto-engine/blob/main/textures/branding/cover.png)
-##A OpenGL Physics Engine
+## A OpenGL Physics Engine
 A custom (but rudimentary) physics engine built specifically to model the behaviors of large celestial bodies. 
 
 
-###real math
+### real math
 $$
 F = G \frac{m_1 m_2}{r^2}
 $$
