@@ -1,5 +1,5 @@
 ![branding](https://github.com/TheMrSnoop/callisto-engine/blob/main/textures/branding/cover.png)
-## A OpenGL Physics Engine
+## An OpenGL Physics Engine
 A custom (but rudimentary) physics engine built specifically to model the behaviors of large celestial bodies. 
 
 
@@ -10,3 +10,4 @@ $$
 
 Every object within the engine follows the gravity equation, meaning each object exerts a gravitational force, on every single other object within a scene. 
 
+This alone allows you to experiment with things such as the *three body problem*, or attempting to balance a custom star system.
