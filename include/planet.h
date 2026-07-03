@@ -1,4 +1,7 @@
+#pragma once
+
 #include "dependencies.h"
+#include "render.h"
 
 class planet
 {
@@ -21,4 +24,6 @@ private:
 
     //current world space coordinates
     glm::vec3 location;
+
+    sphere mesh;
 };

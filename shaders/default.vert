@@ -1,5 +1,10 @@
-in vec3 inVertex;
-void main()
-{
-    gl_Position = vec4(inVertex, 1.0);
+#version 330 core
+
+layout(location = 0) in vec3 vertexPosition;
+
+uniform mat4 view;
+uniform mat4 projection;
+
+void main(){
+    gl_Position = projection * view * vec4(vertexPosition, 1.0);
 }

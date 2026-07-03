@@ -6,8 +6,11 @@ find_package(OpenGL REQUIRED)
 
 add_executable(callisto_engine 
     src/main.cpp
+    src/planet.cpp 
+    src/rendering.cpp
     external/glad/src/glad.c
     external/glad/include/glad/glad.h
+
 )
 
 target_link_libraries(callisto_engine 
