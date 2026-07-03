@@ -33,8 +33,8 @@ void camera::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 
 void camera::mouseScroll(double yoffset)
 {
-    float modifier = lastSpeedMultiplier + (yoffset * 0.01);
-    if (modifier >= 0.001f && modifier <= 100.0f)
+    float modifier = lastSpeedMultiplier + (yoffset * 0.05);
+    if (modifier >= 0.01f && modifier <= 100.0f)
     {
         speedMultiplier = modifier;
         lastSpeedMultiplier = speedMultiplier;

@@ -6,8 +6,10 @@ find_package(OpenGL REQUIRED)
 
 add_executable(callisto_engine 
     src/main.cpp
-    src/planet.cpp 
+    src/celestialBody.cpp 
     src/rendering.cpp
+    src/math.cpp
+    src/scene.cpp
     src/camera.cpp
     src/star.cpp
     external/glad/src/glad.c

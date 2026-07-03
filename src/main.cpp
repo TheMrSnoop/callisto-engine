@@ -2,12 +2,13 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "render.h"
-#include "planet.h"
+#include "celestialBody.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "camera.h"
 #include "system.h"
 #include "star.h"
+#include "scene.h"
 
 
 
@@ -35,25 +36,8 @@ int main()
 
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
-    // a single planet for now.
-    std::vector<planet> scenePlanets;
-    //earth
-    //scenePlanets.push_back(planet(glm::vec3(150.0f, 0.0f, 0.0f)));
 
-    //jupiter
-    planet jupiter(glm::vec3(0.0f, 0.0f, 0.0f), 0.069911f);
-    
-    moon ganymede(0.00263f);
-    moon callisto(0.00241f);
-    moon io(0.001821f);
-    moon europa(0.00156f);
-    jupiter.moons.push_back(ganymede);
-    jupiter.moons.push_back(callisto);
-    jupiter.moons.push_back(io);
-    jupiter.moons.push_back(europa);
-
-    scenePlanets.push_back(jupiter);
-
+    scene mainScene;
 
     star sun(0.697f);
     
@@ -79,7 +63,7 @@ int main()
     glm::mat4 projection = glm::perspective(glm::radians(60.0f), static_cast<float>(resX) / static_cast<float>(resY) , nearPlane, farPlane);
 
     camera mainCamera;
-    mainCamera.speed = 8.0f;
+    mainCamera.speed = 0.25f;
     mainCamera.sensitivity = 250.0f;
 
     // gives GLFW a pointer to the camera object instance
@@ -115,10 +99,7 @@ int main()
 
         //sun.render();
 
-        for (planet planetInstance : scenePlanets)
-        {
-            planetInstance.render();
-        }
+        mainScene.renderScene();
 
 
 
