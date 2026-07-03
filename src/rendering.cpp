@@ -209,69 +209,56 @@ void circle::render()
 
 //SPHERE
 
-void sphere::initialize(float Radius, glm::vec3 OriginPoint, int Resolution, glm::vec4 Color)
+void sphere::initialize(float Radius, glm::vec3 OriginPoint, int Rings, int Vertices, glm::vec4 Color)
 {
-	radius = Radius; originPoint = OriginPoint; resolution = Resolution; color = Color;
+	radius = Radius; originPoint = OriginPoint; verticalRings = Rings; verticesPerRing = Vertices;  color = Color;
 }
 
-glm::vec3 sphere::generateSphericalCoordinates(int index)
-{
-	float theta = ((2.0f * pi * index) / goldenRatio);
-	float phi = glm::acos(1.0f - ((2.0f * index) / resolution));
 
-	float x = glm::cos(theta) * glm::sin(phi) + originPoint.x;
-	float y = glm::sin(theta) * glm::sin(phi) + originPoint.y;
-	float z = glm::cos(phi) + originPoint.z;
+glm::vec3 sphere::generateUVSphereCoordinates(int ringIndex, int vertexIndex)
+{
+	float phi = static_cast<float>(ringIndex) / static_cast<float>(verticalRings - 1) * pi;
+	float theta = ((static_cast<float>(vertexIndex) / verticesPerRing) * 2.0f * pi);
+
+	float x = glm::sin(phi) * glm::cos(theta) * radius + originPoint.x;
+	float y = glm::cos(phi) * radius + originPoint.y;
+	float z = glm::sin(phi) * glm::sin(theta) * radius;
 
 	return glm::vec3(x, y, z);
 }
 
 void sphere::createMesh()
 {
-    //short = smaller int range
-    std::vector<unsigned short> indices;
-
-
-    //generates sphere mesh using the fibancci sphere formula
-    for (int i = 0; i < resolution; i++)
+	vertices.clear();
+    for (int r = 0; r < verticalRings; r++)
     {
-		glm::vec3 coordinates1 = generateSphericalCoordinates(i);
-		glm::vec3 coordinates2 = generateSphericalCoordinates(i + 1);
-		glm::vec3 coordinates3 = generateSphericalCoordinates(i + 2);
-		
+		for (int v = 0; v < verticesPerRing; v++)
+		{
+			//vertex calculation
+			glm::vec tl = generateUVSphereCoordinates(r, v);
+			glm::vec tr = generateUVSphereCoordinates(r, v + 1);
 
+			glm::vec bl = generateUVSphereCoordinates(r + 1, v);
+			glm::vec br = generateUVSphereCoordinates(r + 1, v + 1);
 
-        //then you gotta just like draw the triangle from (origin) -> (x1, y1) -> (x2, y2) -> back to origin
-        vertices.push_back(coordinates1);
-        vertices.push_back(coordinates2);
-        vertices.push_back(coordinates3);
+			//triangle creation
 
+			//triangle 1
+            vertices.push_back(tl);
+            vertices.push_back(bl);
+            vertices.push_back(tr);
 
-        if (!vertices.empty()) indices.push_back(vertices.size() - 1);
+            //triangle 2
+            vertices.push_back(tr);
+            vertices.push_back(bl);
+            vertices.push_back(br);
+		}
     }
-
-
-	for (const auto& v : vertices)
-	{
-		std::cout << v.x << ", " << v.y << ", " << v.z << std::endl;
-	}
-	std::cout << "with a resolution of " << resolution << std::endl;
-
-
-
 
     //Create the vertex buffer object, then set it as the current buffer, then copy the vertex data onto it.
 	glGenBuffers(1, &vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
-
-    //Create the index buffer object, set it as the current index buffer, then copy index data to it.
-    glGenBuffers(1, &indexBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices, GL_STATIC_DRAW);
-
-
-
 }
 
 void sphere::render()

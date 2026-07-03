@@ -27,7 +27,7 @@ class sphere
 public:
     //default resolution is 64
     //default color is white.
-    void initialize(float Radius, glm::vec3 OriginPoint, int Resolution = 64, glm::vec4 Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    void initialize(float Radius, glm::vec3 OriginPoint, int Rings = 8,  int Vertices = 16, glm::vec4 Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
     void createMesh();
 
@@ -36,12 +36,14 @@ private:
     float radius;
     glm::vec3 originPoint; //in world space;
     glm::vec4 color;
-    int resolution; 
+
+    int verticalRings;
+    int verticesPerRing;
 
     GLuint vertexBuffer, indexBuffer, vertexLayout;
     std::vector<glm::vec3> vertices;
 
-    glm::vec3 generateSphericalCoordinates(int index);
+    glm::vec3 generateUVSphereCoordinates(int ringIndex, int vertexIndex);
 };
 
 

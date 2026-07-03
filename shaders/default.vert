@@ -8,3 +8,4 @@ uniform mat4 projection;
 void main(){
     gl_Position = projection * view * vec4(vertexPosition, 1.0);
 }
+

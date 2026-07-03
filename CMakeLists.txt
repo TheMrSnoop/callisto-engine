@@ -8,6 +8,8 @@ add_executable(callisto_engine
     src/main.cpp
     src/planet.cpp 
     src/rendering.cpp
+    src/camera.cpp
+    src/star.cpp
     external/glad/src/glad.c
     external/glad/include/glad/glad.h
 

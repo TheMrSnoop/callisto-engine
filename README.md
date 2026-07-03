@@ -11,3 +11,7 @@ $$
 Every object within the engine follows the gravity equation, meaning each object exerts a gravitational force, on every single other object within a scene. 
 
 This alone allows you to experiment with things such as the *three body problem*, or attempting to balance a custom star system.
+
+
+
+(developed on arch hyprland linux, so there may be a few windows-specific bugs I don't know about.)
