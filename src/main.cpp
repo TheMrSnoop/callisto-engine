@@ -40,6 +40,7 @@ int main()
     scene mainScene;
 
     star sun(0.697f);
+
     
 
 
@@ -97,8 +98,9 @@ int main()
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 
-        //sun.render();
 
+
+        //sun.render();
         mainScene.renderScene();
 
 

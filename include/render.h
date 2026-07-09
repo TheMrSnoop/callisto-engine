@@ -2,6 +2,9 @@
 
 #include "dependencies.h"
 
+
+class celestialBody; 
+
 class circle
 {
 public:
@@ -45,6 +48,27 @@ private:
 
     glm::vec3 generateUVSphereCoordinates(int ringIndex, int vertexIndex);
 };
+
+
+class grid
+{
+public:
+    void deform(std::vector<celestialBody>* sceneBodies);
+    void initialize(int xRes, int yRes);
+    void render();
+
+private:
+    GLuint vertexBuffer, indexBuffer, vertexLayout;
+    std::vector<glm::vec3> vertices;
+
+
+    std::vector<glm::vec3> sceneObjectPositions;
+
+
+    int xResolution;
+    int yResolution;
+};
+
 
 
 class shader

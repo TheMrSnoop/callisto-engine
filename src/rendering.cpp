@@ -2,6 +2,8 @@
 #include <fstream>
 #include <sstream>
 
+#include "celestialBody.h"
+
 
 //piiii
 constexpr double pi = 3.14159265358979323846;
@@ -222,7 +224,7 @@ glm::vec3 sphere::generateUVSphereCoordinates(int ringIndex, int vertexIndex)
 
 	float x = glm::sin(phi) * glm::cos(theta) * radius + originPoint.x;
 	float y = glm::cos(phi) * radius + originPoint.y;
-	float z = glm::sin(phi) * glm::sin(theta) * radius;
+	float z = glm::sin(phi) * glm::sin(theta) * radius + originPoint.z;
 
 	return glm::vec3(x, y, z);
 }
@@ -262,6 +264,90 @@ void sphere::createMesh()
 }
 
 void sphere::render()
+{
+	GLsizei totalVertices = vertices.size();
+
+    // 1st attribute buffer : vertices
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glVertexAttribPointer(
+    0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+    3,                  // size
+    GL_FLOAT,           // type
+    GL_FALSE,           // normalized?
+    0,                  // stride
+    (void*)0            // array buffer offset
+    );
+    // Draw the triangle !
+    glDrawArrays(GL_TRIANGLES, 0, totalVertices); 
+    glDisableVertexAttribArray(0);
+	
+}
+
+
+
+
+
+//GRID GENERATION
+
+
+void grid::deform(std::vector<celestialBody>* sceneBodies)
+{
+	for (celestialBody& world : *sceneBodies)
+	{
+		float Schwarzschild = math::calculateSchwarzschildRadius(math::earthMassToKG(world.mass)) / 1e9L;
+		float difference = math::gigameterToMeter(world.radius);
+		
+		sceneObjectPositions.push_back(glm::vec3(world.location.x, (2.0f * glm::sqrt(Schwarzschild * difference)), world.location.z));
+	}
+}
+
+
+
+void grid::initialize(int xRes, int yRes)
+{
+	xResolution = xRes; yResolution = yRes;
+	float centeredX = xRes / 2;
+	float centeredZ = yRes / 2;
+	
+	for (int x = -centeredX; x < centeredX; x++)
+	{
+		for (int z = -centeredZ; z < centeredZ; z++)
+		{
+			float yDisplacement = 0.0f;
+
+			for (int i = 0; i < sceneObjectPositions.size(); i++)
+			{
+				if (math::distanceSquared2D(glm::vec2(x, z), glm::vec2(sceneObjectPositions[i].x, sceneObjectPositions[i].z)) <= 10.0f);
+				{
+					//I know this makes the array not really scene object positions but whatever.
+					yDisplacement = sceneObjectPositions[i].y;
+				}
+			}
+
+
+			//triangle 1
+			vertices.push_back(glm::vec3(x, yDisplacement, z + 1.0f) * 0.01f);
+			vertices.push_back(glm::vec3(x, yDisplacement, z) * 0.01f);
+			vertices.push_back(glm::vec3(x + 1.0f, yDisplacement, z) * 0.01f);
+
+
+			//triangle 2
+			vertices.push_back(glm::vec3(x + 1.0f, yDisplacement, z) * 0.01f);
+			vertices.push_back(glm::vec3(x, yDisplacement, z + 1.0f) * 0.01f);
+			vertices.push_back(glm::vec3(x + 1.0f, yDisplacement, z + 1.0f) * 0.01f);
+		}
+	}
+
+    //Create the vertex buffer object, then set it as the current buffer, then copy the vertex data onto it.
+	glGenBuffers(1, &vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
+}
+
+
+
+void grid::render()
 {
 	GLsizei totalVertices = vertices.size();
 

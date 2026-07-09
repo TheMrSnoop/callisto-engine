@@ -22,7 +22,7 @@ public:
     glm::vec3 location;
     glm::vec3 currentVelocity = glm::vec3(0.0f, 0.0f, 0.0f);
 private:
-
+    
 
     //HSV color
     glm::vec4 color;

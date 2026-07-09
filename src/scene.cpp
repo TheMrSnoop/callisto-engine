@@ -20,8 +20,16 @@ float scene::calculateGravitationalAcceleration(float objectMassInXEarth, float 
 
 scene::scene()
 {
-    //jupiter
+    celestialBody earth(glm::vec3(0.0f, 0.0f, 0.0f), 0.00637814f, 1.0f);
+    celestialBody moon(glm::vec3(0.384f, 0.0f, 0.0f), 0.0017374f, 0.012f);
+
+    
     celestialBody jupiter(glm::vec3(0.0f, 0.0f, 0.0f), 0.069911f, 318.0f);
+    celestialBody saturn(glm::vec3(0.13f, 0.0f, 10.0f), 0.058232f, 95.16f);
+    celestialBody uranus(glm::vec3((0.13f + 0.025f + 0.0582f), 0.0f, 10.0f), 0.025362f, 14.5f);
+    celestialBody neptune(glm::vec3((0.13f + 0.025f + 0.0582f + 0.0246f), 0.0f, 10.0f), 0.024622f, 17.15f);
+
+
 
     celestialBody ganymede(glm::vec3(1.07f, 0.0f, 0.0f), 0.00263f);
     celestialBody callisto(glm::vec3(1.883f, 0.0f, 0.0f), 0.00241f);
@@ -30,14 +38,20 @@ scene::scene()
 
 
     sceneObjects.push_back(jupiter);
+    //sceneObjects.push_back(saturn);
+    //sceneObjects.push_back(uranus);
+    //sceneObjects.push_back(neptune);
 
     //its moons
-    ganymede.currentVelocity = glm::vec3(1.0f, 0, -10000.0f);
+    ganymede.currentVelocity = glm::vec3(0.0f, 0, 0.1f);
     sceneObjects.push_back(ganymede);
-    sceneObjects.push_back(callisto);
-    io.currentVelocity = glm::vec3(0.0f, 0.0f, 5.0f);
+    //sceneObjects.push_back(callisto);
+    io.currentVelocity = glm::vec3(0.0f, 0.0f, 0.0f);
     sceneObjects.push_back(io);
-    sceneObjects.push_back(europa);
+    //sceneObjects.push_back(europa);
+
+    //sceneObjects.push_back(earth);
+    //sceneObjects.push_back(moon);
 }
 
 void scene::renderScene()
@@ -57,8 +71,8 @@ void scene::renderScene()
             
             float distanceBetweenTwoBodies = math::distanceSquared(primaryBodyRef.location, secondaryBodyRef.location);
             
-            primaryBodyRef.currentVelocity = primaryBodyRef.currentVelocity + (calculateGravitationalAcceleration(secondaryBodyRef.mass, distanceBetweenTwoBodies)) * (secondaryBodyRef.location - primaryBodyRef.location);
-            secondaryBodyRef.currentVelocity = secondaryBodyRef.currentVelocity + (calculateGravitationalAcceleration(primaryBodyRef.mass, distanceBetweenTwoBodies)) * (primaryBodyRef.location - secondaryBodyRef.location);
+            primaryBodyRef.currentVelocity = primaryBodyRef.currentVelocity + (calculateGravitationalAcceleration(secondaryBodyRef.mass, distanceBetweenTwoBodies)) * (glm::normalize(secondaryBodyRef.location - primaryBodyRef.location));
+            secondaryBodyRef.currentVelocity = secondaryBodyRef.currentVelocity + (calculateGravitationalAcceleration(primaryBodyRef.mass, distanceBetweenTwoBodies)) * (glm::normalize(primaryBodyRef.location - secondaryBodyRef.location));
 
             std::cout << "secondary body -> [" << secondaryBodyRef.currentVelocity.x << "] primary body" << std::endl;
         }
@@ -71,4 +85,11 @@ void scene::renderScene()
     {
         body.render();
     }
+
+
+    grid newGrid;
+    newGrid.deform(&sceneObjects);
+    newGrid.initialize(128, 128);
+    newGrid.render();
+
 }
