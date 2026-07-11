@@ -53,20 +53,16 @@ private:
 class grid
 {
 public:
-    void deform(std::vector<celestialBody>* sceneBodies);
-    void initialize(int xRes, int yRes);
+    void initialize(std::vector<celestialBody> celestialObjects, short resolution);
     void render();
 
 private:
     GLuint vertexBuffer, indexBuffer, vertexLayout;
     std::vector<glm::vec3> vertices;
 
+    const int resolutionConstant = 4;
 
-    std::vector<glm::vec3> sceneObjectPositions;
-
-
-    int xResolution;
-    int yResolution;
+    float calculateLayerRadius(int currentIteration) { return 0.05f * currentIteration; };
 };
 
 

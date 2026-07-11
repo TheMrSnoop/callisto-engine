@@ -17,19 +17,31 @@ float math::distanceSquared2D(glm::vec2 v1, glm::vec2 v2)
     return netX + netY;
 }
 
-float math::earthMassToKG(float mass)
+double math::earthMassToKG(double mass)
 {
-    const long massOfEarth = 5.9722e24L;
+    const double massOfEarth = 5.9722e24L;
 
     return massOfEarth * mass;
 }
 
 
-float math::calculateSchwarzschildRadius(float objectMass)
+double math::calculateSchwarzschildRadius(double objectMass)
 {
-    const long gravitationalConstant = 6.67e-11L;
-    const long speedOfLight = 299792458L;
+    const double gravitationalConstant = 6.67e-11L;
+    const double speedOfLight = 299792458L;
 
-    return (2.0f * gravitationalConstant * objectMass) / (speedOfLight * speedOfLight);
+    return (2.0f * gravitationalConstant * earthMassToKG(objectMass)) / (speedOfLight * speedOfLight);
 
+}
+
+
+double math::calculateSpaceTimeDisplacement(double mass, double radius)
+{
+    double schwarzschild = calculateSchwarzschildRadius(mass);
+    double radiusMeters  = gigameterToMeter(radius);
+    double difference    = radiusMeters - schwarzschild;
+
+    double falloff = 1.0 / (radiusMeters * radiusMeters);
+
+    return 0.001 * glm::sqrt(glm::abs(schwarzschild * difference)) * falloff;
 }

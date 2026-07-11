@@ -290,54 +290,99 @@ void sphere::render()
 
 //GRID GENERATION
 
-
-void grid::deform(std::vector<celestialBody>* sceneBodies)
+void grid::initialize(std::vector<celestialBody> objects, short resolution)
 {
-	for (celestialBody& world : *sceneBodies)
+	for (celestialBody world : objects)
 	{
-		float Schwarzschild = math::calculateSchwarzschildRadius(math::earthMassToKG(world.mass)) / 1e9L;
-		float difference = math::gigameterToMeter(world.radius);
-		
-		sceneObjectPositions.push_back(glm::vec3(world.location.x, (2.0f * glm::sqrt(Schwarzschild * difference)), world.location.z));
-	}
-}
+		glm::vec3 worldPosition = world.location;
 
+        float previousRadius   = 0.0f;
+        float previousY        = 0.0f;
+        int   previousSegments = 0;
 
-
-void grid::initialize(int xRes, int yRes)
-{
-	xResolution = xRes; yResolution = yRes;
-	float centeredX = xRes / 2;
-	float centeredZ = yRes / 2;
-	
-	for (int x = -centeredX; x < centeredX; x++)
-	{
-		for (int z = -centeredZ; z < centeredZ; z++)
+		//std::cout << "Spawning a vertex on a plane on " << worldPosition.x << ", " << worldPosition.z << std::endl;
+		//std::cout << "with a resolution of " << resolution << " and a total triangle count of " << resolution * resolutionConstant << std::endl;
+		for (int i = resolution; i > 0; i--)
 		{
-			float yDisplacement = 0.0f;
+			int segments = resolutionConstant * (1 << (i - 1));
+			float radius = calculateLayerRadius((resolution - i) + 1);
 
-			for (int i = 0; i < sceneObjectPositions.size(); i++)
+
+			//ALWAYS the y
+			//I know the vertex position input is a bit off.
+			float vertexDisplacement = math::calculateSpaceTimeDisplacement(world.mass, world.radius); 
+
+			std::cout << "y: " << vertexDisplacement << std::endl;
+
+
+			if (i == resolution)
 			{
-				if (math::distanceSquared2D(glm::vec2(x, z), glm::vec2(sceneObjectPositions[i].x, sceneObjectPositions[i].z)) <= 10.0f);
+				for (int r = 1; r <= segments; r++)
 				{
-					//I know this makes the array not really scene object positions but whatever.
-					yDisplacement = sceneObjectPositions[i].y;
+					float theta1 = (static_cast<float>(r) / static_cast<float>(segments)) * 2.0f * pi;
+					float theta2 = (static_cast<float>(r + 1) / static_cast<float>(segments)) * 2.0f * pi;
+
+					float x1 = glm::cos(theta1) * radius + worldPosition.x;
+					float z1 = glm::sin(theta1) * radius + worldPosition.z;
+
+					float x2 = glm::cos(theta2) * radius + worldPosition.x;
+					float z2 = glm::sin(theta2) * radius + worldPosition.z;
+
+
+					//then you gotta just like draw the triangle from (origin) -> (x1, y1) -> (x2, y2) -> back to origin
+					vertices.push_back(glm::vec3(x1, vertexDisplacement, z1));
+					vertices.push_back(glm::vec3(x2, vertexDisplacement, z2));
+					vertices.push_back(glm::vec3(worldPosition.x, vertexDisplacement, worldPosition.z));
+
+				}
+			}
+			else
+			{
+				for (int o = 1; o <= segments; o++)
+				{
+					//inner segments
+
+					float innerTheta1 = (static_cast<float>(o * 2) / static_cast<float>(previousSegments)) * 2.0f * pi;
+					float innerTheta2 = (static_cast<float>((o * 2) + 1) / static_cast<float>(previousSegments)) * 2.0f * pi;
+					float innerTheta3 = (static_cast<float>((o * 2) + 2) / static_cast<float>(previousSegments)) * 2.0f * pi;
+
+
+					float Ax = worldPosition.x + glm::cos(innerTheta1) * previousRadius;
+					float Az = worldPosition.z + glm::sin(innerTheta1) * previousRadius;
+
+
+					//triangle creation
+
+                    glm::vec3 innerA(Ax, previousY, Az);
+                    glm::vec3 innerM(worldPosition.x + glm::cos(innerTheta2) * segments, previousY, worldPosition.z + glm::sin(innerTheta2) * segments);
+                    glm::vec3 innerB(worldPosition.x + glm::cos(innerTheta3) * segments, previousY, worldPosition.z + glm::sin(innerTheta3) * segments);
+
+
+					//outer segments
+					float outerTheta1 = (static_cast<float>(o) / static_cast<float>(segments)) * 2.0f * pi;
+					float outerTheta2 = (static_cast<float>(o + 1) / static_cast<float>(segments)) * 2.0f * pi;
+
+                    glm::vec3 outerA(worldPosition.x + glm::cos(outerTheta1) * radius, vertexDisplacement, worldPosition.z + glm::sin(outerTheta1) * radius);
+                    glm::vec3 outerB(worldPosition.x + glm::cos(outerTheta2) * radius, vertexDisplacement, worldPosition.z + glm::sin(outerTheta2) * radius);
+
+                    vertices.push_back(outerA); vertices.push_back(innerA); vertices.push_back(innerM);
+                    vertices.push_back(outerA); vertices.push_back(innerM); vertices.push_back(outerB);
+                    vertices.push_back(innerM); vertices.push_back(innerB); vertices.push_back(outerB);
+
+
+
+
+
+
 				}
 			}
 
-
-			//triangle 1
-			vertices.push_back(glm::vec3(x, yDisplacement, z + 1.0f) * 0.01f);
-			vertices.push_back(glm::vec3(x, yDisplacement, z) * 0.01f);
-			vertices.push_back(glm::vec3(x + 1.0f, yDisplacement, z) * 0.01f);
-
-
-			//triangle 2
-			vertices.push_back(glm::vec3(x + 1.0f, yDisplacement, z) * 0.01f);
-			vertices.push_back(glm::vec3(x, yDisplacement, z + 1.0f) * 0.01f);
-			vertices.push_back(glm::vec3(x + 1.0f, yDisplacement, z + 1.0f) * 0.01f);
+            previousRadius   = radius;
+            previousY        = vertexDisplacement;
+            previousSegments = segments;
 		}
 	}
+
 
     //Create the vertex buffer object, then set it as the current buffer, then copy the vertex data onto it.
 	glGenBuffers(1, &vertexBuffer);

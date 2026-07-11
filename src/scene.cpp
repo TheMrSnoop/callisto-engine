@@ -73,8 +73,6 @@ void scene::renderScene()
             
             primaryBodyRef.currentVelocity = primaryBodyRef.currentVelocity + (calculateGravitationalAcceleration(secondaryBodyRef.mass, distanceBetweenTwoBodies)) * (glm::normalize(secondaryBodyRef.location - primaryBodyRef.location));
             secondaryBodyRef.currentVelocity = secondaryBodyRef.currentVelocity + (calculateGravitationalAcceleration(primaryBodyRef.mass, distanceBetweenTwoBodies)) * (glm::normalize(primaryBodyRef.location - secondaryBodyRef.location));
-
-            std::cout << "secondary body -> [" << secondaryBodyRef.currentVelocity.x << "] primary body" << std::endl;
         }
     }
 
@@ -88,8 +86,7 @@ void scene::renderScene()
 
 
     grid newGrid;
-    newGrid.deform(&sceneObjects);
-    newGrid.initialize(128, 128);
+    newGrid.initialize(sceneObjects, 8);
     newGrid.render();
 
 }

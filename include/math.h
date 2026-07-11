@@ -8,9 +8,12 @@ public:
     static float distanceSquared(glm::vec3 v1, glm::vec3 v2);
     static float distanceSquared2D(glm::vec2 v1, glm::vec2 v2);
 
-    static float earthMassToKG(float earthMass);
-    static float gigameterToMeter(float gigameter) { return gigameter * 1e9L; }
+    static double earthMassToKG(double earthMass);
+    static double gigameterToMeter(float gigameter) { return gigameter * 1e9L; }
 
     //IS IN METERS!
-    static float calculateSchwarzschildRadius(float mass);
+    static double calculateSchwarzschildRadius(double mass);
+
+    //formula already handles unit conversions so no worry!
+    static double calculateSpaceTimeDisplacement(double mass, double radius);
 };
